@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .box{
+            width:400px;
+            height: 412px;
+            background:#90ccf0;
+            border:5px solid #96cfec;
+            box-shadow:5px 5px 10px 5px #060cf4;
+            border-radius: 10px;
+            margin: 100px auto 0 auto;
+        }
+        .text{
+            width:calc(100% - 40px);
+            padding: 5px 20px 5px 20px;
+            height: 52px;
+            border-radius: 10px;
+            border: 5px solid #90ccf0;
+            background:#999999;
+            position: relative;
+            left: -5px;
+            top: -5px;
+            outline: none;
+            font-size: 18px;
+        }
+        .main{
+            padding-left: 10px;
+        }
+        .btn{
+            width: 64px;
+            height: 72px;
+            background:#eeeeee;
+            color:black;
+            font-weight: 600;
+            text-align:center;
+            line-height: 62px;
+            border-bottom: 5px solid #98979c;
+            border-radius: 5px;
+            font-size: 18px;
+            margin-right: 10px;
+            margin-top:10px;
+            cursor: pointer;
+            outline: none;
+        }
+        .c{
+            background:#ffb6c1;
+        }
+        .y{
+            background: #fef9cf;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="head">
+            <input class="text" type="text">
+        </div>
+        <div class="main">
+            <button class="btn" value="1">1</button>
+            <button class="btn" value="2">2</button>
+            <button class="btn" value="3">3</button>
+            <button class="btn c" value="c">C</button>
+            <button class="btn y" value="d"><</button>
+            <button class="btn" value="4">4</button>
+            <button class="btn" value="5">5</button>
+            <button class="btn" value="6">6</button>
+            <button class="btn y" value="+">+</button>
+            <button class="btn y" value="-">-</button>
+            <button class="btn" value="7">7</button>
+            <button class="btn" value="8">8</button>
+            <button class="btn" value="9">9</button>
+            <button class="btn y" value="*">*</button>
+            <button class="btn y" value="/">/</button>
+            <button class="btn" value=".">.</button>
+            <button class="btn" value="0">0</button>
+            <button class="btn" value="e">=</button>
+            <button class="btn y" value="√">√</button>
+            <button class="btn y" value="^">^</button>
+        </div>
+    </div>
+
+    <script>
+        var txt=document.querySelector('.text');
+        var btns=document.getElementsByClassName('btn');
+        // console.log(btns);
+        for(var i = 0; i < btns.length; i++){
+            btns[i].val = btns[i].value;
+            btns[i].onclick = function(){//按钮点击
+                
+                var v = this.val;//获取按键的值
+                switch(v){
+                    case 'c':
+                        txt.value = "";break;
+                    case 'd':
+                        txt.value = txt.value.substr(0,txt.value.length-1);break;
+                    case 'e':
+                        var str = txt.value;
+                        var arr = [];
+                        var i =0; //记录arr下标
+
+                    //把字符串全部转换为数字跟运算符号，并且分隔开，用数组保存
+                        while(str.length > 0){
+                            var le = parseFloat(str);
+                            if(!le){//如果遇到的第一个是'√'
+                                le = '√'
+                                arr[i++] = le;
+                                str = str.substr(le.length);
+                                continue;
+                            }
+                            else{//其他情况
+                                le = String(le);
+                                arr[i++] = le;
+                                str = str.substr(le.length);
+                                arr[i++] = str.substr(0,1);
+                                str = str.substr(1);
+                            }
+                            // txt.value = str;    
+                        }
+                        console.log(arr);
+                    //把上一步得来的数组先找出里面的√跟^,优先计算然后得出第二个数组
+                     for(var j = 0; j < arr.length - 1; j++){
+                         if(arr[j] == '√'){
+                             arr[j] = parseFloat((Math.sqrt(arr[j + 1])).toFixed(3));
+                             arr.splice(j+1,1);
+                         }
+                         if(arr[j] == '^'){
+                            arr[j - 1] = Math.pow(arr[j - 1],arr[j + 1]);
+                            arr.splice(j,2);
+                            j--;
+                         }
+                     }
+                    console.log(arr);
+                     //把上步计算完得到的数组再进行计算  *  /
+                     for(var j = 0; j < arr.length - 1;j ++){
+                         if(arr[j] == '*'){
+                             arr[j - 1] = arr[j - 1] * arr[j + 1];
+                             arr.splice(j,2);
+                             j--;
+                         }
+                         if(arr[j] == '/'){
+                            arr[j - 1] = arr[j - 1] / arr[j + 1];
+                            arr.splice(j,2);
+                            j--;
+                         }
+                     }
+                     console.log(arr);
+                    //最后一步计算加减
+                     var sum = 0;
+                     for(var j = 0;j < arr.length; j++){
+                         if(arr[j] == '+'){
+                            arr[j + 1] = parseFloat(arr[j - 1])+parseFloat(arr[j + 1]);
+                            arr[j] ='';
+                            arr[j - 1] ='';
+                            j++;
+                         }   
+                         if(arr[j] == '-'){
+                            arr[j + 1]=parseFloat(arr[j - 1])-parseFloat(arr[j + 1]);
+                            arr[j] = '';
+                            arr[j-1] = '';
+                            j++;
+                        }
+                     }
+                     console.log(arr);
+                     sum = arr[arr.length - 2];
+                     txt.value=parseFloat(sum.toFixed(14));
+                        break;
+                    default:txt.value+=this.val;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
